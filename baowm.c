@@ -27,9 +27,9 @@
 
 /* For brevity's sake, struct members are annotated where they are used. */
 enum baowm_cursor_mode {
-	TINYWL_CURSOR_PASSTHROUGH,
-	TINYWL_CURSOR_MOVE,
-	TINYWL_CURSOR_RESIZE,
+	BAOWM_CURSOR_PASSTHROUGH,
+	BAOWM_CURSOR_MOVE,
+	BAOWM_CURSOR_RESIZE,
 };
 
 struct baowm_server {
@@ -305,7 +305,7 @@ static void server_new_input(struct wl_listener *listener, void *data) {
 		break;
 	}
 	/* We need to let the wlr_seat know what our capabilities are, which is
-	 * communiciated to the client. In TinyWL we always have a cursor, even if
+	 * communiciated to the client. In Baowm we always have a cursor, even if
 	 * there are no pointer devices, so we always include that capability. */
 	uint32_t caps = WL_SEAT_CAPABILITY_POINTER;
 	if (!wl_list_empty(&server->keyboards)) {
@@ -374,7 +374,7 @@ static struct baowm_toplevel *desktop_toplevel_at(
 
 static void reset_cursor_mode(struct baowm_server *server) {
 	/* Reset the cursor mode to passthrough. */
-	server->cursor_mode = TINYWL_CURSOR_PASSTHROUGH;
+	server->cursor_mode = BAOWM_CURSOR_PASSTHROUGH;
 	server->grabbed_toplevel = NULL;
 }
 
@@ -439,10 +439,10 @@ static void process_cursor_resize(struct baowm_server *server) {
 
 static void process_cursor_motion(struct baowm_server *server, uint32_t time) {
 	/* If the mode is non-passthrough, delegate to those functions. */
-	if (server->cursor_mode == TINYWL_CURSOR_MOVE) {
+	if (server->cursor_mode == BAOWM_CURSOR_MOVE) {
 		process_cursor_move(server);
 		return;
-	} else if (server->cursor_mode == TINYWL_CURSOR_RESIZE) {
+	} else if (server->cursor_mode == BAOWM_CURSOR_RESIZE) {
 		process_cursor_resize(server);
 		return;
 	}
@@ -717,7 +717,7 @@ static void begin_interactive(struct baowm_toplevel *toplevel,
 	server->grabbed_toplevel = toplevel;
 	server->cursor_mode = mode;
 
-	if (mode == TINYWL_CURSOR_MOVE) {
+	if (mode == BAOWM_CURSOR_MOVE) {
 		server->grab_x = server->cursor->x - toplevel->scene_tree->node.x;
 		server->grab_y = server->cursor->y - toplevel->scene_tree->node.y;
 	} else {
@@ -746,7 +746,7 @@ static void xdg_toplevel_request_move(
 	 * provided serial against a list of button press serials sent to this
 	 * client, to prevent the client from requesting this whenever they want. */
 	struct baowm_toplevel *toplevel = wl_container_of(listener, toplevel, request_move);
-	begin_interactive(toplevel, TINYWL_CURSOR_MOVE, 0);
+	begin_interactive(toplevel, BAOWM_CURSOR_MOVE, 0);
 }
 
 static void xdg_toplevel_request_resize(
@@ -758,7 +758,7 @@ static void xdg_toplevel_request_resize(
 	 * client, to prevent the client from requesting this whenever they want. */
 	struct wlr_xdg_toplevel_resize_event *event = data;
 	struct baowm_toplevel *toplevel = wl_container_of(listener, toplevel, request_resize);
-	begin_interactive(toplevel, TINYWL_CURSOR_RESIZE, event->edges);
+	begin_interactive(toplevel, BAOWM_CURSOR_RESIZE, event->edges);
 }
 
 static void xdg_toplevel_request_maximize(
@@ -992,7 +992,7 @@ int main(int argc, char *argv[]) {
 	 *
 	 * And more comments are sprinkled throughout the notify functions above.
 	 */
-	server.cursor_mode = TINYWL_CURSOR_PASSTHROUGH;
+	server.cursor_mode = BAOWM_CURSOR_PASSTHROUGH;
 	server.cursor_motion.notify = server_cursor_motion;
 	wl_signal_add(&server.cursor->events.motion, &server.cursor_motion);
 	server.cursor_motion_absolute.notify = server_cursor_motion_absolute;
