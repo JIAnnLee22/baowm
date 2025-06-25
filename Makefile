@@ -7,7 +7,7 @@ CFLAGS_PKG_CONFIG!=$(PKG_CONFIG) --cflags $(PKGS)
 CFLAGS+=$(CFLAGS_PKG_CONFIG)
 LIBS!=$(PKG_CONFIG) --libs $(PKGS)
 
-all: jwl
+all: baowm
 
 # wayland-scanner is a tool which generates C headers and rigging for Wayland
 # protocols, which are specified in XML. wlroots requires you to rig these up
@@ -16,13 +16,13 @@ xdg-shell-protocol.h:
 	$(WAYLAND_SCANNER) server-header \
 		$(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml $@
 
-jwl.o: jwl.c xdg-shell-protocol.h
+baowm.o: baowm.c xdg-shell-protocol.h
 	$(CC) -c $< -g -Werror $(CFLAGS) -I. -DWLR_USE_UNSTABLE -o $@
-jwl: jwl.o
+baowm: baowm.o
 	$(CC) $^ $> -g -Werror $(CFLAGS) $(LDFLAGS) $(LIBS) -o $@
 
 clean:
-	rm -f jwl jwl.o xdg-shell-protocol.h
+	rm -f baowm baowm.o xdg-shell-protocol.h
 
 .PHONY: all clean
 
