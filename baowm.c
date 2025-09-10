@@ -24,6 +24,7 @@
 #include <wlr/types/wlr_xdg_shell.h>
 #include <wlr/util/log.h>
 #include <xkbcommon/xkbcommon.h>
+#include "config.h"
 
 /* For brevity's sake, struct members are annotated where they are used. */
 enum baowm_cursor_mode {
@@ -190,6 +191,13 @@ static bool handle_keybinding(struct baowm_server *server, xkb_keysym_t sym) {
 		struct baowm_toplevel *next_toplevel =
 			wl_container_of(server->toplevels.prev, next_toplevel, link);
 		focus_toplevel(next_toplevel);
+		break;
+	case XKB_KEY_p:
+	case XKB_KEY_P:
+		/* 启动 wofi */
+		if (fork() == 0) {
+			execl("/usr/bin/wofi", "wofi", (void *)NULL);
+		}
 		break;
 	default:
 		return false;
@@ -870,7 +878,26 @@ static void server_new_xdg_popup(struct wl_listener *listener, void *data) {
 	popup->destroy.notify = xdg_popup_destroy;
 	wl_signal_add(&xdg_popup->events.destroy, &popup->destroy);
 }
+static void quit_handler(struct baowm_server *server) {
+	wl_display_terminate(server->wl_display);
+}
 
+static void cycle_handler(struct baowm_server *server) {
+	/* Cycle to the next toplevel */
+	if (wl_list_length(&server->toplevels) < 2) {
+		return;
+	}
+	struct baowm_toplevel *next_toplevel =
+		wl_container_of(server->toplevels.prev, next_toplevel, link);
+	focus_toplevel(next_toplevel);
+}
+
+static void menu_handler(struct baowm_server *server) {
+	/* Launch menu */
+	if (fork() == 0) {
+		execlp(MENU, MENU, (void *)NULL);
+	}
+}
 int main(int argc, char *argv[]) {
 	wlr_log_init(WLR_DEBUG, NULL);
 	char *startup_cmd = NULL;

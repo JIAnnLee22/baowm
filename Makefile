@@ -16,13 +16,16 @@ xdg-shell-protocol.h:
 	$(WAYLAND_SCANNER) server-header \
 		$(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml $@
 
-baowm.o: baowm.c xdg-shell-protocol.h
+# config.h包含配置选项
+config.h:
+	@echo "Using config.h for build configuration"
+
+baowm.o: baowm.c xdg-shell-protocol.h config.h
 	$(CC) -c $< -g -Werror $(CFLAGS) -I. -DWLR_USE_UNSTABLE -o $@
 baowm: baowm.o
-	$(CC) $^ $> -g -Werror $(CFLAGS) $(LDFLAGS) $(LIBS) -o $@
+	$(CC) $^ -g -Werror $(CFLAGS) $(LDFLAGS) $(LIBS) -o $@
 
 clean:
 	rm -f baowm baowm.o xdg-shell-protocol.h
 
 .PHONY: all clean
-
