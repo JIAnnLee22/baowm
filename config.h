@@ -4,7 +4,7 @@
 
 #define MODKEY WLR_MODIFIER_ALT
 #define TERMINAL "kitty"
-#define MENU "wofi --show run"
+#define MENU "wofi --show drun"
 
 static const struct keycode_map {
   xkb_keysym_t keysym;
